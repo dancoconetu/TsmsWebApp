@@ -21,8 +21,9 @@ Hello!!!!
 
 <h2> Files</h2>
 
+ <a href="website/goToParentFolder"> ... Up folder </a> </br>
 <c:forEach var ="item" items="${folderList}">
-    <c:out value="${item}"/> <br/>
+    <c:out value="${item.absolutePath}"/>  <a href="website/${folderList.indexOf(item)}"> Change main folder to this</a> </br>
 </c:forEach>
 
 

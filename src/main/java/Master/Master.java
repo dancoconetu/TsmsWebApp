@@ -31,7 +31,7 @@ public class Master implements Runnable
     SystemInfo systemInfo = new SystemInfo();
     private Mutex taskMutex = new Mutex();
 
-    private String PATH2 = "C:\\Users\\dic\\ToSend\\";
+    private String PATH2 = "C:\\Users\\dic\\";
     public FolderInfo folderInfo;
 
     public Master(int port)
