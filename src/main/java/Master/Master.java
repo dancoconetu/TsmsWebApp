@@ -9,6 +9,7 @@ import Master.Common.XMLClasses.XMLParser;
 import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -246,6 +247,24 @@ public class Master implements Runnable
         System.out.println("Client refused: maximum " + clients.length + " reached.");
     }
 
+
+    public MasterThread[] getAllSlaves()
+    {
+        return clients;
+    }
+
+    public MasterThread getSlaveByIp(InetAddress ip)
+    {
+        for (MasterThread slave : clients)
+        {
+            if (slave.getIp().equals(ip))
+            {
+                return slave;
+            }
+        }
+
+        return null;
+    }
 
     public void sendFiles(MasterThread slave)
     {

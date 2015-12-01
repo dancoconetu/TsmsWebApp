@@ -20,6 +20,7 @@ public class WebController {
     private int count;
     Master master = null;
     List<File> list;
+    List<Boolean> listBoolean;
 
     @RequestMapping("/website")
     public String something(ModelMap model) {
@@ -27,14 +28,29 @@ public class WebController {
             master = new Master(7777);
         System.out.println("started!: " + ++count);
         File folderPath = master.folderInfo.folderPath;
-        list = new ArrayList<File>();
-        try {
-            showDir(1, folderPath, list);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (folderPath !=null) {
+            list = new ArrayList<File>();
+            listBoolean = new ArrayList<Boolean>();
+            try {
+                showDir(1, folderPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
         }
-        String[] list2 = {"1", "2"};
+        else
+        {
+            File[] roots = File.listRoots();
+            list = new ArrayList<File>();
+            listBoolean = new ArrayList<Boolean>();
+            for(int i = 0; i < roots.length ; i++) {
+                list.add(roots[i]);
+                listBoolean.add(true);
+            }
+        }
         model.addAttribute("folderList", list);
+        model.addAttribute("folderListBoolean", listBoolean);
 
 
         return "anotherpage.jsp";
@@ -42,9 +58,19 @@ public class WebController {
 
     @RequestMapping("/website/goToParentFolder")
     public String goToParentFolder(@RequestHeader("referer") String referedFrom) {
+        try {
 
-        System.out.println("Parent is: " + master.folderInfo.folderPath.getParent());
-        master.folderInfo.folderPath = new File(master.folderInfo.folderPath.getParent());
+
+            //if (master.folderInfo.folderPath.getParentFile().exists()) {
+                System.out.println("Parent is: " + master.folderInfo.folderPath.getParent());
+                master.folderInfo.folderPath = new File(master.folderInfo.folderPath.getParent());
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            master.folderInfo.folderPath = null;
+        }
 
 
         return "redirect:" + referedFrom;
@@ -59,20 +85,41 @@ public class WebController {
 
     }
 
-    static void showDir(int indent, File file, List<File> list)
+
+    @RequestMapping(value = "/sendFiles/{folderIndex}")
+    public String sendFiles(@PathVariable("folderIndex") int folderIndex, @RequestHeader("referer") String referedFrom) {
+        File file = master.folderInfo.folderPath;
+        master.folderInfo.folderPath = list.get(folderIndex);
+        System.out.println("sending this folder:" + master.folderInfo.folderPath);
+        master.getAllSlaves()[0].sendMissingFiles(master.folderInfo.folderPath,master.folderInfo);
+
+        //master.folderInfo.folderPath = file;
+
+
+        return "redirect:" + referedFrom;
+
+    }
+    void showDir(int indent, File file)
             throws IOException {
 
 
         list.add(file);
+
+
         if (file.isDirectory() && !file.isHidden() || file.isAbsolute()) {
+            listBoolean.add(false);
             File[] files;
             try {
                 files = file.listFiles();
                 for (int i = 0; i < files.length; i++)
                     //showDir(indent + 4, files[i], list);
-                    if (!files[i].isHidden())
+                    if (!files[i].isHidden()) {
                         list.add(files[i]);
-
+                        if (files[i].isDirectory())
+                            listBoolean.add(true);
+                        else
+                            listBoolean.add(false);
+                    }
             } catch (Exception e) {
                 e.printStackTrace();
             }
