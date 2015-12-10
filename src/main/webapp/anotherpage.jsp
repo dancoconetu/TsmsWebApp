@@ -7,6 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<link href="${pageContext.request.contextPath}/css/main.css" rel="stylesheet" >
 <html>
 <head>
     <title>Pick Folder</title>
@@ -21,12 +22,20 @@
 
 <h2> Files</h2>
 
- <a href="website/goToParentFolder"> ... Up folder </a> </br>
-<c:forEach var ="item" items="${folderList}">
-    <c:out value="${item.absolutePath}"/>  <c:if test="${folderListBoolean.get(folderList.indexOf(item))==true}"> <a href="website/${folderList.indexOf(item)}"/>  Go Into</a> <a href="sendFiles/${folderList.indexOf(item)}"/>  Send Folder</a></c:if> </br>
-</c:forEach>
+<a href="website/goToParentFolder"> ... Up folder </a> </br>
+<div id="container">
+<div id="left" style="width:789px; max-height:165px; overflow:auto; max-width: 400px">
+    <font color="blue">Current Folder: </font>
+    <c:forEach var ="item" items="${folderList}">
+        <c:if test="${folderListBoolean.get(folderList.indexOf(item))==true}">  <a href="website/${folderList.indexOf(item)}" />   </c:if>    <c:out value="${item.absolutePath}" />   </a>   <a href="sendFiles/${folderList.indexOf(item)} " style="float:right" /> <font color = "red" >
+    Send</font>  </a>  </br>
+    </c:forEach>
+</div>
 
 
-
+<div  id="right" >
+    Hello?
+    </div>
+</div>
 </body>
 </html>

@@ -3,6 +3,7 @@ package Master; /**
  */
 
 
+import Master.Common.Chronometer;
 import Master.Common.FolderInfo;
 import Master.Common.XMLClasses.XMLCreator;
 import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
@@ -27,6 +28,7 @@ public class MasterThread extends Thread
     private int filesCount;
     public int repeted= 0;
     private byte[] mybytearray;
+
     public MasterThread(Master _master, Socket _socket, Socket _socketFileReceive, Socket _socketFileSend, Mutex _mutex, FolderInfo _folderInfo)
     {  super();
         master = _master;
@@ -36,6 +38,7 @@ public class MasterThread extends Thread
         folderInfo = _folderInfo;
         socketFileReceive = _socketFileReceive;
         socketFileSend = _socketFileSend;
+
     }
     public void sendMessage(String _msg) {
         final String msg = _msg;
@@ -222,7 +225,7 @@ public class MasterThread extends Thread
     public void sendMissingFiles(File folder, FolderInfo folderInfo)
     {
         ArrayList<File> allFilesInSubFolders= new ArrayList<File>();
-        folderInfo.listf(folderInfo.folderPath.toString(), allFilesInSubFolders);
+        folderInfo.listf(folder.toString(), allFilesInSubFolders);
 
 //        for (File f : allFilesInSubFolders)
 //        {
@@ -241,9 +244,9 @@ public class MasterThread extends Thread
         for (String[] row: list)
         {
             File path2 =  new File(folderInfo.folderPath + row[2]);
-            System.out.println("path2: " + path2);
+
             File file = new File(path2.getAbsolutePath() + File.separator + row[0]);
-            System.out.println("file: " + file.getAbsolutePath());
+
             if (file.exists())
                 sendFile(file,folderInfo);
         }
@@ -358,6 +361,10 @@ public class MasterThread extends Thread
         }
 
         }
+
+
+        master.status[0]= master.status[1];
+        master.status[1] = System.currentTimeMillis();
 
 
 

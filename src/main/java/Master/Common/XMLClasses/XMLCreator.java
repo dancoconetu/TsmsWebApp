@@ -140,11 +140,15 @@ public class XMLCreator {
         Attr fileSize = doc.createAttribute("FileSize");
         fileSize.setValue(file.length()+"");
         rootElement.setAttributeNode(fileSize);
-
-        Attr filePath = doc.createAttribute("FilePath");
-        filePath.setValue(file.getParentFile().getAbsolutePath().substring( folderInfo.folderPath.getAbsolutePath().length()));
-        rootElement.setAttributeNode(filePath);
-
+        try {
+            Attr filePath = doc.createAttribute("FilePath");
+          filePath.setValue(file.getParentFile().getAbsolutePath().substring(folderInfo.folderPath.getAbsolutePath().length()));
+            rootElement.setAttributeNode(filePath);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
 
         return createStringFromXmlDoc(doc);
     }

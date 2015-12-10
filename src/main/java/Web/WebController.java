@@ -89,10 +89,27 @@ public class WebController {
     @RequestMapping(value = "/sendFiles/{folderIndex}")
     public String sendFiles(@PathVariable("folderIndex") int folderIndex, @RequestHeader("referer") String referedFrom) {
         File file = master.folderInfo.folderPath;
-        master.folderInfo.folderPath = list.get(folderIndex);
-        System.out.println("sending this folder:" + master.folderInfo.folderPath);
-        master.getAllSlaves()[0].sendMissingFiles(master.folderInfo.folderPath,master.folderInfo);
+        //master.folderInfo.folderPath = list.get(folderIndex);
+        System.out.println("sending this folder:" + list.get(folderIndex));
+        if(! list.get(folderIndex).isFile()) {
+            master.getAllSlaves()[0].sendMissingFiles(list.get(folderIndex), master.folderInfo);
+            System.out.println("it s a directory");
+        }
+        else {
+            master.getAllSlaves()[0].sendFile(list.get(folderIndex), master.folderInfo);
+            //master.folderInfo.folderPath = file;
+        }
 
+
+//        while(true)
+//        {
+//            if ((master.status[1]-master.status[0])/1000.0 > 4) {
+//                master.folderInfo.folderPath = file;
+//                System.out.println(" Breaking!!! because: " + (master.status[1]-master.status[0])/1000.0);
+//                break;
+//            }
+//
+//        }
         //master.folderInfo.folderPath = file;
 
 

@@ -32,6 +32,8 @@ public class Master implements Runnable
     SystemInfo systemInfo = new SystemInfo();
     private Mutex taskMutex = new Mutex();
 
+    public double[] status = new double[2];
+
     private String PATH2 = "C:\\Users\\dic\\";
     public FolderInfo folderInfo;
 
@@ -157,7 +159,7 @@ public class Master implements Runnable
         return -1;
     }
     public synchronized void handle(int ID, String input)
-    {
+    {   System.out.println("Input: "+ ID + ": " + input);
         try {
             taskMutex.acquire();
         } catch (InterruptedException e) {
