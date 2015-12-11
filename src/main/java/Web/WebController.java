@@ -25,7 +25,7 @@ public class WebController {
     @RequestMapping("/website")
     public String something(ModelMap model) {
         if (master == null)
-            master = new Master(7777);
+            master = Master.getInstance();
         System.out.println("started!: " + ++count);
         File folderPath = master.folderInfo.folderPath;
         if (folderPath !=null) {
@@ -53,7 +53,7 @@ public class WebController {
         model.addAttribute("folderListBoolean", listBoolean);
 
 
-        return "anotherpage.jsp";
+        return "main.jsp";
     }
 
     @RequestMapping("/website/goToParentFolder")
@@ -100,17 +100,6 @@ public class WebController {
             //master.folderInfo.folderPath = file;
         }
 
-
-//        while(true)
-//        {
-//            if ((master.status[1]-master.status[0])/1000.0 > 4) {
-//                master.folderInfo.folderPath = file;
-//                System.out.println(" Breaking!!! because: " + (master.status[1]-master.status[0])/1000.0);
-//                break;
-//            }
-//
-//        }
-        //master.folderInfo.folderPath = file;
 
 
         return "redirect:" + referedFrom;

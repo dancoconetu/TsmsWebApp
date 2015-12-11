@@ -20,7 +20,9 @@ import java.util.Queue;
 import static java.lang.Thread.sleep;
 
 public class Master implements Runnable
-{   public MasterThread clients[] = new MasterThread[50];
+{
+    private static Master instance = null;
+    public MasterThread clients[] = new MasterThread[50];
     private ServerSocket server = null;
     private Thread       thread = null;
     private int clientCount = 0;
@@ -37,14 +39,22 @@ public class Master implements Runnable
     private String PATH2 = "C:\\Users\\dic\\";
     public FolderInfo folderInfo;
 
-    public Master(int port)
+    private Master()
     {  try
-    {  System.out.println("Binding to port " + port + ", please wait  ...");
-        server = new ServerSocket(port);
+    {  System.out.println("Binding to port " + 7777+ ", please wait  ...");
+        server = new ServerSocket(7777);
         System.out.println("Master started: " + server);
         start(); }
     catch(IOException ioe)
-    {  System.out.println("Can not bind to port " + port + ": " + ioe.getMessage()); }
+    {  System.out.println("Can not bind to port " + 7777 + ": " + ioe.getMessage()); }
+    }
+
+    public static Master getInstance() {
+        if(instance == null) {
+            instance = new Master();
+        }
+        return instance;
+
     }
     public void run()
 
@@ -282,6 +292,6 @@ public class Master implements Runnable
        // if (args.length != 1)
         //    System.out.println("Usage: java Master port");
        // else
-            master = new Master(7777);
+            master = new Master();
     }
 }
