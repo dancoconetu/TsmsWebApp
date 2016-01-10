@@ -35,7 +35,8 @@
     </div>
 
     <div id="right">
-        <jsp:include page="${request.contextPath}/SlaveDropDown.jsp"></jsp:include>
+        <%--<jsp:include page="${request.contextPath}/SlaveDropDown.jsp"></jsp:include>--%>
+Hello
     </div>
 </div>
 </body>

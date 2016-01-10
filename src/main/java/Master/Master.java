@@ -70,7 +70,7 @@ public class Master implements Runnable
                 }
                 //for (int k=0; k<500; j++)
                 for (int i = 0; i < clientCount; i++) {
-                    //clients[i].sendMessage("server:" + s);
+//                    clients[i].sendMessage("server:" + s);
                     if(s.equals("sendJar"))
                     {   File temp = folderInfo.folderPath;
                         folderInfo.folderPath = new File("C:\\Users\\dic\\IdeaProjects\\Tsms-Client\\target\\");

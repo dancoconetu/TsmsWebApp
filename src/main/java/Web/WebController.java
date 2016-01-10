@@ -89,7 +89,6 @@ public class WebController {
     @RequestMapping(value = "/sendFiles/{folderIndex}")
     public String sendFiles(@PathVariable("folderIndex") int folderIndex, @RequestHeader("referer") String referedFrom) {
         File file = master.folderInfo.folderPath;
-        //master.folderInfo.folderPath = list.get(folderIndex);
         System.out.println("sending this folder:" + list.get(folderIndex));
         if(! list.get(folderIndex).isFile()) {
             master.getAllSlaves()[0].sendMissingFiles(list.get(folderIndex), master.folderInfo);
@@ -100,7 +99,7 @@ public class WebController {
             //master.folderInfo.folderPath = file;
         }
 
-
+        master.getAllSlaves()[0].sendMessage("server:script");
 
         return "redirect:" + referedFrom;
 
