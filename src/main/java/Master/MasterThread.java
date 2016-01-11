@@ -12,6 +12,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 public class MasterThread extends Thread
 {  private Master master = null;
@@ -28,6 +29,7 @@ public class MasterThread extends Thread
     private int filesCount;
     public int repeted= 0;
     private byte[] mybytearray;
+    public Hashtable osInfo;
 
     public MasterThread(Master _master, Socket _socket, Socket _socketFileReceive, Socket _socketFileSend, Mutex _mutex, FolderInfo _folderInfo)
     {  super();
@@ -38,6 +40,7 @@ public class MasterThread extends Thread
         folderInfo = _folderInfo;
         socketFileReceive = _socketFileReceive;
         socketFileSend = _socketFileSend;
+        ip = socket.getInetAddress();
 
     }
     public void sendMessage(String _msg) {

@@ -20,16 +20,19 @@
 
 <%--<input type="file" id="ctrl" webkitdirectory directory multiple/>--%>
 
+OsName: ${OsName} <br>
+PcName: ${PcName} <br>
+
 <h2> Files</h2>
 
-<a href="website/goToParentFolder"> ... Up folder </a> </br>
+<a href="/website/goToParentFolder"> ... Up folder </a> </br>
 <div id="container">
     <div id="left" style="width:789px; max-height:165px; overflow:auto; max-width: 400px">
         <font color="blue">Current Folder: </font>
         <c:forEach var="item" items="${folderList}">
             <c:if test="${folderListBoolean.get(folderList.indexOf(item))==true}"> <a
-                    href="website/${folderList.indexOf(item)}"/> </c:if> <c:out value="${item.absolutePath}"/> </a> <a
-                href="sendFiles/${folderList.indexOf(item)} " style="float:right"/> <font color="red">
+                    href="/website/${folderList.indexOf(item)}"/> </c:if> <c:out value="${item.absolutePath}"/> </a> <a
+                href="/sendFiles/${folderList.indexOf(item)} " style="float:right"/> <font color="red">
             Send</font> </a> </br>
         </c:forEach>
     </div>

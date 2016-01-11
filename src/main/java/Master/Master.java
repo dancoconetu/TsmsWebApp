@@ -211,6 +211,13 @@ public class Master implements Runnable
             clients[findClient(ID)].sendMultipleFilesFromList(xmlParser.parseSendMultipleFiles(input));
         }
 
+
+        if (input.contains("<SendOsInfo"))
+        {
+             clients[findClient(ID)].osInfo = xmlParser.parseOsInfo(input);
+            System.out.println("Os Info here:" + clients[findClient(ID)].osInfo.get("OsName"));
+        }
+
         taskMutex.release();
     }
     public synchronized void remove(int ID)

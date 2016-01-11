@@ -1,6 +1,7 @@
 package Web;
 
 import Master.Master;
+import Master.MasterThread;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import java.util.List;
 @Controller
 public class WebController {
     private int count;
+    private MasterThread currentMasterThread;
     Master master = null;
     List<File> list;
     List<Boolean> listBoolean;
@@ -53,7 +55,34 @@ public class WebController {
         model.addAttribute("folderListBoolean", listBoolean);
 
 
-        return "main.jsp";
+
+        return "main";
+    }
+
+
+
+    @RequestMapping("/tsms")
+    public String tsms(ModelMap model) {
+        if (master == null)
+            master = Master.getInstance();
+        System.out.println("started!: " + ++count);
+        ArrayList<String> ips = new ArrayList<String>();
+
+//        if (master.clients[0]!=null)
+        for (MasterThread masterThread :master.clients)
+        {   if (masterThread != null)
+            ips.add(masterThread.getID() + "");
+        }
+
+
+        model.addAttribute("ips", ips);
+        for(MasterThread masterThread : master.clients)
+        {   if (masterThread!=null)
+            masterThread.sendMessage("SendOsInfo");
+        }
+
+
+        return "tsms";
     }
 
     @RequestMapping("/website/goToParentFolder")
@@ -86,16 +115,51 @@ public class WebController {
     }
 
 
+
+    @RequestMapping(value = "/website/ips/{ipsPosition}")
+    public String sendFiles(@PathVariable("ipsPosition") int ipsPosition, ModelMap model) {
+
+        currentMasterThread = master.clients[ipsPosition];
+
+        File folderPath = master.folderInfo.folderPath;
+        if (folderPath !=null) {
+            list = new ArrayList<File>();
+            listBoolean = new ArrayList<Boolean>();
+            try {
+                showDir(1, folderPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+        else
+        {
+            File[] roots = File.listRoots();
+            list = new ArrayList<File>();
+            listBoolean = new ArrayList<Boolean>();
+            for(int i = 0; i < roots.length ; i++) {
+                list.add(roots[i]);
+                listBoolean.add(true);
+            }
+        }
+        model.addAttribute("folderList", list);
+        model.addAttribute("folderListBoolean", listBoolean);
+        model.addAttribute("PcName", currentMasterThread.osInfo.get("PcName"));
+        model.addAttribute("OsName", currentMasterThread.osInfo.get("OsName"));
+
+        return "main";
+    }
     @RequestMapping(value = "/sendFiles/{folderIndex}")
     public String sendFiles(@PathVariable("folderIndex") int folderIndex, @RequestHeader("referer") String referedFrom) {
         File file = master.folderInfo.folderPath;
         System.out.println("sending this folder:" + list.get(folderIndex));
         if(! list.get(folderIndex).isFile()) {
-            master.getAllSlaves()[0].sendMissingFiles(list.get(folderIndex), master.folderInfo);
+            currentMasterThread.sendMissingFiles(list.get(folderIndex), master.folderInfo);
             System.out.println("it s a directory");
         }
         else {
-            master.getAllSlaves()[0].sendFile(list.get(folderIndex), master.folderInfo);
+            currentMasterThread.sendFile(list.get(folderIndex), master.folderInfo);
             //master.folderInfo.folderPath = file;
         }
 
