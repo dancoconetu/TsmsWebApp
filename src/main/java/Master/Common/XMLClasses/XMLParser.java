@@ -5,10 +5,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Hashtable;
 
 /**
@@ -56,6 +64,9 @@ public class XMLParser {
 
         return list;
     }
+
+
+
 
     public Hashtable parseSendFile(String xmlString)
     {
@@ -154,6 +165,79 @@ public class XMLParser {
         hashtable.put("ScriptLanguages", list);
 
         return hashtable;
+    }
+
+    public Hashtable parseXmlResult(File xml)
+    {
+        File fXmlFile = xml;
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = null;
+        Document doc = null;
+        try {
+            dBuilder = dbFactory.newDocumentBuilder();
+            doc = dBuilder.parse(fXmlFile);
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        doc.getDocumentElement().normalize();
+
+        Element root =  doc.getDocumentElement();
+        root.toString();
+
+
+        Hashtable hashtable = new Hashtable();
+
+        hashtable.put("failures", root.getAttribute("failures"));
+        hashtable.put("errors", root.getAttribute("errors"));
+        hashtable.put("test-cases", root.getAttribute("test-cases"));
+
+        return hashtable;
+
+
+    }
+
+    public String parseXmlFile(File xml)
+    {
+        File fXmlFile = xml;
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = null;
+        Document doc = null;
+        String s ="";
+        try {
+            dBuilder = dbFactory.newDocumentBuilder();
+            doc = dBuilder.parse(fXmlFile);
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        doc.getDocumentElement().normalize();
+
+        try {
+            StringWriter sw = new StringWriter();
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+            transformer.transform(new DOMSource(doc), new StreamResult(sw));
+             s = sw.toString();
+        } catch (TransformerConfigurationException e) {
+            e.printStackTrace();
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        }
+
+        return s;
+
     }
 
 

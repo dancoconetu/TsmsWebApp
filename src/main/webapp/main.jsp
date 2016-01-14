@@ -20,8 +20,19 @@
 
 <%--<input type="file" id="ctrl" webkitdirectory directory multiple/>--%>
 
+
+
+<%
+    // Set refresh, autoload time as 5 seconds
+    response.setIntHeader("Refresh", 5);
+    %>
 OsName: ${OsName} <br>
 PcName: ${PcName} <br>
+Python versions:
+<c:forEach var="item" items="${PythonVersions}">
+ <br>  ${item} </br>
+
+</c:forEach>
 
 <h2> Files</h2>
 
@@ -37,9 +48,34 @@ PcName: ${PcName} <br>
         </c:forEach>
     </div>
 
-    <div id="right">
-        <%--<jsp:include page="${request.contextPath}/SlaveDropDown.jsp"></jsp:include>--%>
-Hello
+
+    <div id="right" style="width:789px; max-height:265px; overflow:auto; max-width: 600px">
+
+            <font color="blue"> Available scripts on the slave </font>
+            <c:forEach var="item" items="${Scripts}">
+                <font color="red"> <br>${item} </font>  </br>
+                <c:forEach var="version" items="${PythonVersions}">  <a href="/runScript/${Scripts.indexOf(item)}/${version}"> ${version} </a>></c:forEach>
+
+
+            </c:forEach>
+
+    </div>
+
+    <div id ="bottom">
+        <br>
+        Script results:
+        <br>
+        <pre>${LastScriptResults}</pre>
+    </div>
+
+
+    <div id="bottomright" style="width:789px; max-height:265px; overflow:auto; max-width: 600px">
+    <c:forEach var="item" items="${XmlResults}">
+    <c:if test="${XmlResultsBooleans.get(XmlResults.indexOf(item))==true}" >
+        <font color="green" > </c:if> <c:if test="${XmlResultsBooleans.get(XmlResults.indexOf(item))==false}" >
+            <font color="red" > </c:if>
+        <br> <a href="/showXml/${XmlResults.indexOf(item)}"> <c:out value = "${item}"/> </a> Failures: ${XmlResultsHashTables.get(XmlResults.indexOf(item)).get("failures")}
+  </c:forEach>
     </div>
 </div>
 </body>

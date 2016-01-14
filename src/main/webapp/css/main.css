@@ -3,5 +3,23 @@
 }
 
 #right{
+    position: absolute;
+    top:0;
+    right:0;
     float: right;
+}
+
+#bottom {
+    position: absolute;
+    bottom: 0;
+    float:left
+}
+
+#bottomright
+{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    float :right;
+
 }

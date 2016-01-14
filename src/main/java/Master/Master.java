@@ -36,7 +36,8 @@ public class Master implements Runnable
 
     public double[] status = new double[2];
 
-    private String PATH2 = "C:\\Users\\dic\\";
+    private String PATH2 = "C:\\";
+    public String tsmsFolder = "C:\\TSMS";
     public FolderInfo folderInfo;
 
     private Master()
@@ -211,11 +212,46 @@ public class Master implements Runnable
             clients[findClient(ID)].sendMultipleFilesFromList(xmlParser.parseSendMultipleFiles(input));
         }
 
+        String script = "ScriptResults:";
+
+        if (input.contains(script))
+        {
+            clients[findClient(ID)].lastScriptResults = input;
+        }
+
 
         if (input.contains("<SendOsInfo"))
         {
              clients[findClient(ID)].osInfo = xmlParser.parseOsInfo(input);
             System.out.println("Os Info here:" + clients[findClient(ID)].osInfo.get("OsName"));
+        }
+
+        if (input.contains("PythonVersions"))
+        {    clients[findClient(ID)].pythonVersions = new ArrayList<String>();
+            if (input.contains("PythonVersionsMac"))
+            {
+                String versions = input.substring(18);
+                String[] list = versions.split(";");
+                for (String k: list)
+                {
+                    clients[findClient(ID)].pythonVersions.add("python"+k);
+                }
+
+            }
+            else
+            {
+                String versions = input.substring(15);
+                String[] list = versions.split(";");
+                for (String k: list)
+                {
+                    clients[findClient(ID)].pythonVersions.add(k);
+                }
+            }
+        }
+
+        if (input.contains("<PythonScripts"))
+        {
+            clients[findClient(ID)].pythonScriptsAvailable = xmlParser.parseSendMultipleFiles(input);
         }
 
         taskMutex.release();
@@ -289,6 +325,7 @@ public class Master implements Runnable
     {
         slave.sendMissingFiles(folderInfo.folderPath, folderInfo);
     }
+
 
 
 

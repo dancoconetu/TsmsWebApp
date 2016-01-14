@@ -1,5 +1,6 @@
 package Web;
 
+import Master.Common.XMLClasses.XMLParser;
 import Master.Master;
 import Master.MasterThread;
 import org.springframework.stereotype.Controller;
@@ -23,41 +24,42 @@ public class WebController {
     Master master = null;
     List<File> list;
     List<Boolean> listBoolean;
+    int resultsNr ;
 
-    @RequestMapping("/website")
-    public String something(ModelMap model) {
-        if (master == null)
-            master = Master.getInstance();
-        System.out.println("started!: " + ++count);
-        File folderPath = master.folderInfo.folderPath;
-        if (folderPath !=null) {
-            list = new ArrayList<File>();
-            listBoolean = new ArrayList<Boolean>();
-            try {
-                showDir(1, folderPath);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-        }
-        else
-        {
-            File[] roots = File.listRoots();
-            list = new ArrayList<File>();
-            listBoolean = new ArrayList<Boolean>();
-            for(int i = 0; i < roots.length ; i++) {
-                list.add(roots[i]);
-                listBoolean.add(true);
-            }
-        }
-        model.addAttribute("folderList", list);
-        model.addAttribute("folderListBoolean", listBoolean);
-
-
-
-        return "main";
-    }
+//    @RequestMapping("/website")
+//    public String something(ModelMap model) {
+//        if (master == null)
+//            master = Master.getInstance();
+//        System.out.println("started!: " + ++count);
+//        File folderPath = master.folderInfo.folderPath;
+//        if (folderPath !=null) {
+//            list = new ArrayList<File>();
+//            listBoolean = new ArrayList<Boolean>();
+//            try {
+//                showDir(1, folderPath);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//
+//        }
+//        else
+//        {
+//            File[] roots = File.listRoots();
+//            list = new ArrayList<File>();
+//            listBoolean = new ArrayList<Boolean>();
+//            for(int i = 0; i < roots.length ; i++) {
+//                list.add(roots[i]);
+//                listBoolean.add(true);
+//            }
+//        }
+//        model.addAttribute("folderList", list);
+//        model.addAttribute("folderListBoolean", listBoolean);
+//
+//
+//
+//        return "main";
+//    }
 
 
 
@@ -71,14 +73,18 @@ public class WebController {
 //        if (master.clients[0]!=null)
         for (MasterThread masterThread :master.clients)
         {   if (masterThread != null)
-            ips.add(masterThread.getID() + "");
+            ips.add(masterThread.getIp() + ":" + masterThread.getID());
         }
 
 
         model.addAttribute("ips", ips);
         for(MasterThread masterThread : master.clients)
-        {   if (masterThread!=null)
-            masterThread.sendMessage("SendOsInfo");
+        {
+            if (masterThread!=null)
+                {
+                masterThread.sendMessage("SendOsInfo");
+                masterThread.sendMessage("AvailablePythonScripts");
+                }
         }
 
 
@@ -117,16 +123,17 @@ public class WebController {
 
 
     @RequestMapping(value = "/website/ips/{ipsPosition}")
-    public String sendFiles(@PathVariable("ipsPosition") int ipsPosition, ModelMap model) {
+    public String goToSlave(@PathVariable("ipsPosition") int ipsPosition, ModelMap model) {
 
         currentMasterThread = master.clients[ipsPosition];
-
+        currentMasterThread.sendMessage("AvailablePythonScripts");
+        currentMasterThread.sendMessage("AvailablePythonVersions");
         File folderPath = master.folderInfo.folderPath;
         if (folderPath !=null) {
             list = new ArrayList<File>();
             listBoolean = new ArrayList<Boolean>();
             try {
-                showDir(1, folderPath);
+                showDir(folderPath);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -147,7 +154,27 @@ public class WebController {
         model.addAttribute("folderListBoolean", listBoolean);
         model.addAttribute("PcName", currentMasterThread.osInfo.get("PcName"));
         model.addAttribute("OsName", currentMasterThread.osInfo.get("OsName"));
+        model.addAttribute("PythonVersions", currentMasterThread.pythonVersions);
+        model.addAttribute("XmlResults", currentMasterThread.getXmlResults());
+        model.addAttribute("XmlResultsHashTables",currentMasterThread.getXmlResultsHashtables() );
+        model.addAttribute("XmlResultsBooleans", currentMasterThread.getXmlResultsBoolean());
+        if (currentMasterThread.lastScriptResults!=null)
+        {
+            model.addAttribute("LastScriptResults", currentMasterThread.lastScriptResults);
+        }
+        else
+        {
+            model.addAttribute("LastScriptResults", "No Script was run lately");
+        }
 
+        while(currentMasterThread.pythonScriptsAvailable==null);
+        ArrayList<String> availablePythonScripts = new ArrayList<String>();
+        System.out.println("Nr of scripts: " + currentMasterThread.pythonScriptsAvailable.length);
+        for (int i=0; i< currentMasterThread.pythonScriptsAvailable.length; i++ )
+        {
+            availablePythonScripts.add(currentMasterThread.pythonScriptsAvailable[i][0] + ":(" +currentMasterThread.pythonScriptsAvailable[i][2] + ")" );
+        }
+        model.addAttribute("Scripts", availablePythonScripts );
         return "main";
     }
     @RequestMapping(value = "/sendFiles/{folderIndex}")
@@ -163,12 +190,41 @@ public class WebController {
             //master.folderInfo.folderPath = file;
         }
 
-        master.getAllSlaves()[0].sendMessage("server:script");
+
 
         return "redirect:" + referedFrom;
 
     }
-    void showDir(int indent, File file)
+
+    @RequestMapping(value = "/runScript/{scriptIndex}/{pythonVersion}")
+    public String runSript(@PathVariable("scriptIndex") int scriptIndex,@PathVariable("pythonVersion") String pythonVersion , @RequestHeader("referer") String referedFrom) {
+
+        try {
+            System.out.println("Running this script:" + currentMasterThread.pythonScriptsAvailable[scriptIndex][2]);
+
+
+            currentMasterThread.sendMessage("server:script" + currentMasterThread.pythonScriptsAvailable[scriptIndex][2] + ";" + pythonVersion);
+        }
+        catch (Exception ex)
+        {   ex.printStackTrace();
+            if (currentMasterThread.pythonScriptsAvailable.length<scriptIndex-1)
+                System.out.println("Index out of bound.");
+        }
+        return "redirect:" + referedFrom;
+
+    }
+
+    @RequestMapping(value = "/showXml/{xmlIndex}")
+    public String showXml(@PathVariable("xmlIndex") int xmlIndex , ModelMap model) {
+
+        XMLParser xmlParser = new XMLParser();
+        String xml = xmlParser.parseXmlFile(currentMasterThread.getXmlResults().get(xmlIndex));
+        model.addAttribute("xml",xml);
+        return "ShowXml";
+
+    }
+
+    void showDir(File file)
             throws IOException {
 
 
@@ -194,4 +250,6 @@ public class WebController {
             }
         }
     }
+
+
 }

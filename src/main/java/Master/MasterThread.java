@@ -6,6 +6,7 @@ package Master; /**
 import Master.Common.Chronometer;
 import Master.Common.FolderInfo;
 import Master.Common.XMLClasses.XMLCreator;
+import Master.Common.XMLClasses.XMLParser;
 import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
 
 import java.io.*;
@@ -21,7 +22,7 @@ public class MasterThread extends Thread
     private DataInputStream  streamIn  =  null;
     private DataOutputStream streamOut = null;
     private InetAddress           ip;
-    private String PATH = "C:\\Users\\dic\\sent";
+    private String PATH = "C:\\TSMS";
     private Mutex mutex;
     private FolderInfo folderInfo;
     private Socket socketFileReceive;
@@ -30,6 +31,9 @@ public class MasterThread extends Thread
     public int repeted= 0;
     private byte[] mybytearray;
     public Hashtable osInfo;
+    public String[][] pythonScriptsAvailable;
+    public String lastScriptResults;
+    public ArrayList<String> pythonVersions;
 
     public MasterThread(Master _master, Socket _socket, Socket _socketFileReceive, Socket _socketFileSend, Mutex _mutex, FolderInfo _folderInfo)
     {  super();
@@ -161,7 +165,7 @@ public class MasterThread extends Thread
           //  String imageName = dis.readUTF();
           //  String imagePath = dis.readUTF();
             imagePath = imagePath.replace("\\", File.separator);
-            File path2 =  new File(PATH + imagePath);
+            File path2 =  new File(PATH +getIp().toString()+ File.separator + imagePath);
             path2.mkdirs();
             //String imageFound = dis.readUTF();
 //            System.out.println(imageFound);
@@ -369,13 +373,6 @@ public class MasterThread extends Thread
         master.status[0]= master.status[1];
         master.status[1] = System.currentTimeMillis();
 
-
-
-
-
-
-
-
     }
 
     public void sleepTime()
@@ -387,5 +384,46 @@ public class MasterThread extends Thread
         {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<File> getXmlResults()
+    {
+        File location = new File(PATH + File.separator + getIp().toString());
+
+        return folderInfo.getAllFilesWithExtensionFromSubfolders("xml",location);
+
+
+    }
+
+    public ArrayList<Hashtable> getXmlResultsHashtables()
+    {   ArrayList<Hashtable> hashtables = new ArrayList<Hashtable>();
+        for (File file: getXmlResults())
+        {
+            XMLParser xmlParser = new XMLParser();
+            Hashtable hashtable = xmlParser.parseXmlResult(file);
+            hashtables.add(hashtable);
+        }
+
+        return hashtables;
+
+    }
+
+    public ArrayList<Boolean> getXmlResultsBoolean()
+    {
+        ArrayList<Hashtable> hashtables = getXmlResultsHashtables();
+        ArrayList<Boolean> booleans = new ArrayList<Boolean>();
+
+        for (Hashtable hashtable: hashtables)
+        {
+            if (hashtable.get("failures").equals("0"))
+                booleans.add(true);
+                else
+                booleans.add(false);
+        }
+        for(Boolean boo : booleans)
+        {
+            System.out.println("Script true or false? :" + boo.toString());
+        }
+        return booleans;
     }
 }

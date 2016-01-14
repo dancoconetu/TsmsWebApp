@@ -14,12 +14,16 @@
 </head>
 <body>
 
-
+<%
+    // Set refresh, autoload time as 5 seconds
+    response.setIntHeader("Refresh", 5);
+%>
 <div id="left" style="width:789px; max-height:165px; overflow:auto; max-width: 400px">
-    <font color="blue">Current Folder: </font>
+    <font color="blue">Available Slaves: </font>
+    <br>
     <c:forEach var="item" items="${ips}">
        ${item}    <a
-            href="website/ips/${ips.indexOf(item)}"> Check this computer </a>  <br>
+            href="website/ips/${ips.indexOf(item)}"> Go to this slave </a>  <br>
     </c:forEach>
 </div>
 </body>
