@@ -71,10 +71,7 @@ public class WebController {
         ArrayList<String> ips = new ArrayList<String>();
 
 //        if (master.clients[0]!=null)
-        for (MasterThread masterThread :master.clients)
-        {   if (masterThread != null)
-            ips.add(masterThread.getIp() + ":" + masterThread.getID());
-        }
+
 
 
         model.addAttribute("ips", ips);
@@ -87,9 +84,19 @@ public class WebController {
                 }
         }
 
+        for (MasterThread masterThread :master.clients)
+        {   if (masterThread != null)
+            if (masterThread.osInfo!=null)
+            ips.add(masterThread.getIp() + " : " + masterThread.osInfo.get("OsName") + " ---" + masterThread.osInfo.get("PcName") );
+            else
+                ips.add(masterThread.getIp()+"");
+        }
+
 
         return "tsms";
     }
+
+
 
     @RequestMapping("/website/goToParentFolder")
     public String goToParentFolder(@RequestHeader("referer") String referedFrom) {
@@ -167,6 +174,8 @@ public class WebController {
             model.addAttribute("LastScriptResults", "No Script was run lately");
         }
 
+        model.addAttribute("Status", currentMasterThread.status);
+
         while(currentMasterThread.pythonScriptsAvailable==null);
         ArrayList<String> availablePythonScripts = new ArrayList<String>();
         System.out.println("Nr of scripts: " + currentMasterThread.pythonScriptsAvailable.length);
@@ -177,6 +186,9 @@ public class WebController {
         model.addAttribute("Scripts", availablePythonScripts );
         return "main";
     }
+
+
+
     @RequestMapping(value = "/sendFiles/{folderIndex}")
     public String sendFiles(@PathVariable("folderIndex") int folderIndex, @RequestHeader("referer") String referedFrom) {
         File file = master.folderInfo.folderPath;
@@ -196,6 +208,17 @@ public class WebController {
 
     }
 
+
+    @RequestMapping(value = "/deleteFile/{fileIndex}")
+    public String deleteFile(@PathVariable("fileIndex") int fileIndex, @RequestHeader("referer") String referedFrom) {
+        currentMasterThread.sendMessage("deleteFile:" + currentMasterThread.filesAvailable[fileIndex][2]);
+
+
+
+        return "redirect:" + referedFrom;
+
+    }
+
     @RequestMapping(value = "/runScript/{scriptIndex}/{pythonVersion}")
     public String runSript(@PathVariable("scriptIndex") int scriptIndex,@PathVariable("pythonVersion") String pythonVersion , @RequestHeader("referer") String referedFrom) {
 
@@ -204,6 +227,7 @@ public class WebController {
 
 
             currentMasterThread.sendMessage("server:script" + currentMasterThread.pythonScriptsAvailable[scriptIndex][2] + ";" + pythonVersion);
+            currentMasterThread.status = "Request to run script sent to slave";
         }
         catch (Exception ex)
         {   ex.printStackTrace();
@@ -221,6 +245,22 @@ public class WebController {
         String xml = xmlParser.parseXmlFile(currentMasterThread.getXmlResults().get(xmlIndex));
         model.addAttribute("xml",xml);
         return "ShowXml";
+
+    }
+
+    @RequestMapping(value = "/showFiles")
+    public String showFiles( ModelMap model) {
+        currentMasterThread.sendMessage("FilesAvailable");
+        ArrayList<String> filesAvailable = new ArrayList<String>();
+        while (currentMasterThread.filesAvailable==null);
+        System.out.println("Nr of filesAvailable: " + currentMasterThread.filesAvailable.length);
+        for (int i=0; i< currentMasterThread.filesAvailable.length; i++ )
+        {
+            filesAvailable.add(currentMasterThread.filesAvailable[i][2]);
+        }
+
+        model.addAttribute("filesAvailable",filesAvailable);
+        return "ShowFiles";
 
     }
 

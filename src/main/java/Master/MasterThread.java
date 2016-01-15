@@ -13,6 +13,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 
 public class MasterThread extends Thread
@@ -32,8 +33,10 @@ public class MasterThread extends Thread
     private byte[] mybytearray;
     public Hashtable osInfo;
     public String[][] pythonScriptsAvailable;
+    public String[][] filesAvailable;
     public String lastScriptResults;
     public ArrayList<String> pythonVersions;
+    public String status;
 
     public MasterThread(Master _master, Socket _socket, Socket _socketFileReceive, Socket _socketFileSend, Mutex _mutex, FolderInfo _folderInfo)
     {  super();
@@ -257,6 +260,8 @@ public class MasterThread extends Thread
             if (file.exists())
                 sendFile(file,folderInfo);
         }
+
+        status = "Multiple files succesfully sent!";
     }
 
     public void sendMultipleFiles(File folder, FolderInfo folderInfo)
@@ -351,6 +356,7 @@ public class MasterThread extends Thread
         catch (Exception e)
         {
             e.printStackTrace();
+            status = "Failed sending file: " + myFile;
         }
         finally
         {
@@ -368,6 +374,7 @@ public class MasterThread extends Thread
         }
 
         }
+        status = "File " + myFile + " sent!";
 
 
         master.status[0]= master.status[1];
@@ -389,8 +396,9 @@ public class MasterThread extends Thread
     public ArrayList<File> getXmlResults()
     {
         File location = new File(PATH + File.separator + getIp().toString());
-
-        return folderInfo.getAllFilesWithExtensionFromSubfolders("xml",location);
+        ArrayList<File> xmlFiles = folderInfo.getAllFilesWithExtensionFromSubfolders("xml",location);
+        Collections.reverse(xmlFiles);
+        return xmlFiles;
 
 
     }
@@ -403,6 +411,7 @@ public class MasterThread extends Thread
             Hashtable hashtable = xmlParser.parseXmlResult(file);
             hashtables.add(hashtable);
         }
+
 
         return hashtables;
 

@@ -3,9 +3,9 @@
 <body>
 
 <a href="tsms">Go To </a>
+<meta http-equiv="refresh" content="0; url=/tsms" />
 
 
-<a href="/resources/tsms-client-1.0-SNAPSHOT-jar-with-dependencies.jar" >download </a>
 
 </body>
 </html>

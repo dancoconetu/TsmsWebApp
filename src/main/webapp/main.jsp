@@ -26,13 +26,16 @@
     // Set refresh, autoload time as 5 seconds
     response.setIntHeader("Refresh", 5);
     %>
+<div id="OsDiv" >
 OsName: ${OsName} <br>
 PcName: ${PcName} <br>
 Python versions:
 <c:forEach var="item" items="${PythonVersions}">
- <br>  ${item} </br>
+  ${item}
 
 </c:forEach>
+    <a href="/showFiles" >Show files available</a>
+</div>
 
 <h2> Files</h2>
 
@@ -46,6 +49,7 @@ Python versions:
                 href="/sendFiles/${folderList.indexOf(item)} " style="float:right"/> <font color="red">
             Send</font> </a> </br>
         </c:forEach>
+
     </div>
 
 
@@ -62,10 +66,14 @@ Python versions:
     </div>
 
     <div id ="bottom">
+        <div id ="bottomTop">
+        <br>
+        Status: ${Status}
         <br>
         Script results:
         <br>
         <pre>${LastScriptResults}</pre>
+        </div>
     </div>
 
 

@@ -7,7 +7,15 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
+<style>
+    .download {
+        position: absolute;
+        float:right;
+        right:0;
+        top:0;
+        background-color: #EEE; /*to make it visible*/
+    }
+</style>
 <html>
 <head>
     <title>Title</title>
@@ -22,9 +30,12 @@
     <font color="blue">Available Slaves: </font>
     <br>
     <c:forEach var="item" items="${ips}">
-       ${item}    <a
-            href="website/ips/${ips.indexOf(item)}"> Go to this slave </a>  <br>
+       <a
+            href="website/ips/${ips.indexOf(item)}">  ${item}    </a>  <br>
     </c:forEach>
+</div>
+<div class ="download">
+<a href="/resources/tsms-client-1.0-SNAPSHOT-jar-with-dependencies.jar" >download </a>
 </div>
 </body>
 </html>

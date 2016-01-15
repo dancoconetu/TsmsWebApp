@@ -217,6 +217,7 @@ public class Master implements Runnable
         if (input.contains(script))
         {
             clients[findClient(ID)].lastScriptResults = input;
+            clients[findClient(ID)].status = "Script run succesfully";
         }
 
 
@@ -252,6 +253,11 @@ public class Master implements Runnable
         if (input.contains("<PythonScripts"))
         {
             clients[findClient(ID)].pythonScriptsAvailable = xmlParser.parseSendMultipleFiles(input);
+        }
+
+        if (input.contains("<FilesAvailable"))
+        {
+            clients[findClient(ID)].filesAvailable = xmlParser.parseSendMultipleFiles(input);
         }
 
         taskMutex.release();

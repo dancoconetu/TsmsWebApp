@@ -2,6 +2,12 @@
     float: left;
 }
 
+#OsDiv
+{
+    position: fixed;
+    left : 35%;
+    clear : left;
+}
 #right{
     position: absolute;
     top:0;
@@ -13,6 +19,10 @@
     position: absolute;
     bottom: 0;
     float:left
+}
+#bottomTop {
+    position:relative;
+    top:0;
 }
 
 #bottomright
