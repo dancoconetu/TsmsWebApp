@@ -12,8 +12,11 @@ import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Hashtable;
 
 public class MasterThread extends Thread
@@ -130,6 +133,10 @@ public class MasterThread extends Thread
         }
     }
 
+
+
+
+
     public void open() throws IOException
     {
         streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
@@ -168,7 +175,10 @@ public class MasterThread extends Thread
           //  String imageName = dis.readUTF();
           //  String imagePath = dis.readUTF();
             imagePath = imagePath.replace("\\", File.separator);
-            File path2 =  new File(PATH +getIp().toString()+ File.separator + imagePath);
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = new Date();
+
+            File path2 =  new File(PATH +getIp().toString()+ File.separator + dateFormat.format(date) + File.separator+ imagePath);
             path2.mkdirs();
             //String imageFound = dis.readUTF();
 //            System.out.println(imageFound);
